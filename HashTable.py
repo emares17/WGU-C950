@@ -52,20 +52,21 @@ class Hashmap:
     def get(self, key):
         index = self._hash(key)
 
-        for entry_key, val in self.table[index]:
-            if entry_key == key:
-                return val
+        for kv_pair in self.table[index]:
+            print(kv_pair)
+            if kv_pair[0] == key:
+                return kv_pair[1]
         
         raise KeyError(f'Key {key} was not found.')
 
     def remove(self, key):
         index = self._hash(key)
-        pass
+        for kv_pair in self.table[index]:
+            if kv_pair[0] == key:
+                self.table[index].remove(kv_pair)
+                self.used_slots -= 1
+                return
 
-hash_map = Hashmap()
+        raise KeyError(f'Key {key} was not found')
 
-hash_map.insert('apple', 5)
 
-result = hash_map.get('apple')
-
-print(result)
