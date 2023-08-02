@@ -53,7 +53,6 @@ class Hashmap:
         index = self._hash(key)
 
         for kv_pair in self.table[index]:
-            print(kv_pair)
             if kv_pair[0] == key:
                 return kv_pair[1]
         
