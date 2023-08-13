@@ -16,7 +16,7 @@ def read_distance_matrix(distance_file):
             address = row[0]
             addresses.append(address)
             
-            distances.append([element for element in row[1:]])
+            distances.append([0 if element == '' else float(element) for element in row[1:]])
 
     return distances, column_headers, addresses
 
@@ -33,13 +33,12 @@ def calculate_distance(current_package, next_package):
 
     for idx, val in enumerate(headers):
         if val == next_package:
-            next_address = idx
+            next_address = idx 
             break
 
     distance = distances[current_address][next_address]
+   
+    return distances[next_address][current_address] if distance == 0 else distance
 
-    if distance == '':
-        return 0.0
-    else:    
-        return float(distance)
+
 
