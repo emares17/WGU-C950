@@ -35,6 +35,21 @@ def id_to_address(truck):
 
     return addresses
 
+def package_status(id, time):
+    (hour, minutes, seconds) = time.split(':')
+    converted_time = datetime.timedelta(hours = int(hour), minutes = int(minutes), seconds = int(seconds))
+
+    for package in packages:
+        if package.ID == id:
+            if package.del_time < converted_time:
+                package.status = 'Delivered'
+            elif converted_time > package.depart_time and converted_time < package.del_time:
+                package.status = 'En Route'
+            else:
+                package.status = 'At Hub'
+
+            return f'Package {id} current status is {package.status}'
+
 
 def nearest_neighbor(truck):
     packages1 = id_to_address(truck)
@@ -56,8 +71,8 @@ def nearest_neighbor(truck):
                     nearest_location = next_location
         if nearest_location == -1:
             package = hash_map.get(truck.packages[current_location])
+            package.depart_time = truck.departure_time
             package.del_time = truck.current_time
-            # package.status = 'Delivered'
             break
         else:
             truck.current_time += datetime.timedelta(hours = nearest_distance / 18) 
@@ -67,10 +82,12 @@ def nearest_neighbor(truck):
         package = hash_map.get(truck.packages[current_location])
         package.depart_time = truck.departure_time
         package.del_time = truck.current_time
-        # package.status = 'Delivered'
 
         truck.current_loc = nearest_location
         current_location = nearest_location
 
 print(nearest_neighbor(truck1))
 
+# for package in packages:
+#     if int(package.ID) in truck1.packages:
+#         print(package)
