@@ -12,7 +12,8 @@ class Package:
         self.depart_time = None
 
     def __str__(self):
-        return f'Package ID: {self.ID}, Address: {self.address}, City: {self.del_city}' \
+        return f'Package ID: {self.ID}, Address: {self.address}, City: {self.del_city},' \
             f' State: {self.del_state}, Zip Code: {self.del_zip}' \
-            f' Deadline: {self.deadline}, Weight: {self.weight}, Status: {self.status}, Delivery Time: {self.del_time}, Departure Time: {self.depart_time}'
+            f' Deadline: {self.deadline}, Weight: {self.weight}, Status: {self.status},' \
+            f' Delivery Time: {self.del_time}, Departure Time: {self.depart_time}'
     
