@@ -1,4 +1,4 @@
-class Hashmap:
+class HashTable:
     def __init__(self):
         self.size = 10
         self.table = [[] for _ in range(self.size)]
@@ -60,6 +60,7 @@ class Hashmap:
 
     def remove(self, key):
         index = self._hash(key)
+        
         for kv_pair in self.table[index]:
             if kv_pair[0] == key:
                 self.table[index].remove(kv_pair)

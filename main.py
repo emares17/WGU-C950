@@ -1,28 +1,28 @@
+# Name: Fidel Mares
+# Student ID: 001413646
+# Class: WGU C950 Data Structures and Algorithms II
+
 import csv
 import datetime
 from Distance import calculate_distance, distances
-from HashTable import Hashmap
+from HashTable import HashTable
 from Package import Package
-from Truck import Truck
+from Truck import truck1, truck2, truck3
 
 package_file = 'CSV/package_file.csv'
 
 packages = []
-hash_map = Hashmap()
+hash_table = HashTable()
 
 with open(package_file, newline = '') as file:
     reader = csv.reader(file)
     for row in reader:
         id, address, city, state, zipcode, deadline, weight, status = row
-        package = Package(ID = id, address = address, del_city = city, del_state = state, del_zip = zipcode, deadline = deadline, weight=weight, status = 'At Hub')
+        package = Package(ID = id, address = address, del_city = city, del_state = state, del_zipcode = zipcode, deadline = deadline, weight=weight, status = 'At Hub')
 
         packages.append(package)
 
-        hash_map.insert(int(id), package)
-
-truck1 = Truck([1, 13, 14, 15, 16, 20, 29, 30, 31, 34, 37, 40], 18, datetime.timedelta(hours=8), 0, 'HUB')
-truck2 = Truck([3,6,12,17,18,19,21,22,23,24,26,27,35,36,38,39], 18, datetime.timedelta(hours=10, minutes=20), 0, 'HUB')
-truck3 = Truck([2, 4, 5, 6, 7, 8, 9, 10, 11, 25, 28, 32, 33], 18, datetime.timedelta(hours=9, minutes=5), 0, 'HUB')
+        hash_table.insert(int(id), package)
 
 trucks = [truck1, truck2, truck3]
 
@@ -30,7 +30,7 @@ def id_to_address(truck):
     addresses = []
 
     for id in truck.packages:
-        package = hash_map.get(id)
+        package = hash_table.get(id)
 
         if package in packages:
             addresses.append(package.address)
@@ -58,7 +58,7 @@ def view_all(time):
         print(package)
         
 def view_single(id, time):
-    package = hash_map.get(id)
+    package = hash_table.get(id)
 
     if package is not None:
         package_status(package.ID, time)
@@ -72,11 +72,11 @@ def calculate_milage(trucks):
     return f'{count:.2f}'
 
 def nearest_neighbor(truck):
-    packages1 = id_to_address(truck)
-    total_locations = len(packages1)
+    truck_packages = id_to_address(truck)
+    total_locations = len(truck_packages)
     visited = [False] * total_locations
     current_location = 0 
-    truck.milage += calculate_distance(truck.current_loc, packages1[0])
+    truck.milage += calculate_distance(truck.current_loc, truck_packages[0])
 
     for _ in range(total_locations):
         visited[current_location] = True
@@ -85,12 +85,12 @@ def nearest_neighbor(truck):
 
         for next_location in range(total_locations):
             if not visited[next_location]:
-                distance = calculate_distance(packages1[current_location], packages1[next_location])
+                distance = calculate_distance(truck_packages[current_location], truck_packages[next_location])
                 if distance < nearest_distance:
                     nearest_distance = distance
                     nearest_location = next_location
         if nearest_location == -1:
-            package = hash_map.get(truck.packages[current_location])
+            package = hash_table.get(truck.packages[current_location])
             package.depart_time = truck.departure_time
             package.del_time = truck.current_time
             break
@@ -99,7 +99,7 @@ def nearest_neighbor(truck):
 
         truck.milage += nearest_distance
 
-        package = hash_map.get(truck.packages[current_location])
+        package = hash_table.get(truck.packages[current_location])
         package.depart_time = truck.departure_time
         package.del_time = truck.current_time
 
@@ -109,10 +109,6 @@ def nearest_neighbor(truck):
 for truck in trucks:
     nearest_neighbor(truck)
 
-# for package in packages:
-#     if int(package.ID) in truck1.packages or int(package.ID) in truck2.packages or int(package.ID) in truck3.packages:
-#         print(package.ID, package.status, package.depart_time, package.del_time)
-
 class main:
     print('Welcome to WGUPS delivery!')
     print(f'The total milage driven today was {calculate_milage(trucks)} miles.')
@@ -121,13 +117,12 @@ class main:
         print('Would you like to search a package or view all?')
         search = input("Enter 'All' to view all packages or enter a package ID: ")
         
-        if search.lower() != 'all' and search != search.isdigit():
+        if search.lower() != 'all' and not search.isdigit():
             exit = input('Would you like to exit? Yes or No: ')
             if exit.lower() == 'yes':
                 break
         else:
             time = input('Enter a time in HH:MM:SS format only: ')
-            print(search, time)
 
             if search.isdigit():
                 id = int(search)
@@ -142,7 +137,9 @@ class main:
                     id = int(package_id)
                     view_single(id, time)
                 else:
-                    break
+                    exit = input('Would you like to exit? Yes or No: ')
+                    if exit.lower() == 'yes':
+                        break
             else:
                 exit = input('Would you like to exit? Yes or No: ')
 
