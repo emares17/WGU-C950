@@ -8,6 +8,7 @@ from Distance import calculate_distance, distances
 from HashTable import HashTable
 from Package import Package
 from Truck import truck1, truck2, truck3
+import tkinter as tk
 
 # Initiates variable to the package file that will be used in the program.
 package_file = 'CSV/package_file.csv'
@@ -68,9 +69,12 @@ def package_status(id, time):
 # This function will then be called in which it iterates through each package of the packages list, updates the status using the package_status() function, 
 # and then prints out every individual package.
 def view_all(time):
+    results = []
+    
     for package in packages:
         package_status(package.ID, time)
-        print(package)
+        results.append(str(package) + '\n' + '\n')
+    return ''.join(results)
         
 # Used in the user interface to display a single package search at a given time. If the package is found in the Hash Table, it updates the package status using the package_status()
 # function and then prints the package with all of its attributes.
@@ -79,7 +83,7 @@ def view_single(id, time):
 
     if package is not None:
         package_status(package.ID, time)
-        print(package)
+        return str(package)
 
 # Calculates the total milage driven by all truck by iterating over the total driven milage of each truck.
 def calculate_milage(trucks):
@@ -151,40 +155,115 @@ for truck in trucks:
 
 # User interface allows the user to look-up all packages or individual packages at any given time. The program then displays the package/s with all
 # of its attributes. The user will be prompted to continue searching or exit the program.
-class main:
-    print('Welcome to WGUPS delivery!')
-    print(f'The total milage driven today was {calculate_milage(trucks)} miles.')
 
-    while True:
-        print('Would you like to search a package or view all?')
-        search = input("Enter 'All' to view all packages or enter a package ID: ")
-        
-        if search.lower() != 'all' and not search.isdigit():
+def handle_search():
+    search = search_entry.get()
+    time = time_entry.get()
+
+    if search.lower() != 'all' and not search.isdigit():
+        exit = input('Would you like to exit? Yes or No: ')
+        if exit.lower() == 'yes':
+            root.quit()
+    else:
+
+        if search.isdigit():
+            id = int(search)
+
+            result_text.delete("1.0", tk.END)  
+
+            result = view_single(id, time)
+            result_text.insert(tk.END, result)  
+
+            search_entry.delete(0, tk.END)
+            time_entry.delete(0, tk.END)
+
+        elif search.lower() == 'all':
+            
+            result_text.delete("1.0", tk.END)  
+
+            result = view_all(time)
+            result_text.insert(tk.END, result)  
+
+            search_entry.delete(0, tk.END)
+            time_entry.delete(0, tk.END)
+
+        else:
             exit = input('Would you like to exit? Yes or No: ')
             if exit.lower() == 'yes':
-                break
-        else:
-            time = input('Enter a time in HH:MM:SS format only: ')
+                root.quit()
 
-            if search.isdigit():
-                id = int(search)
-                view_single(id, time)
+root = tk.Tk()
+root.title("WGUPS Delivery")
+root.geometry("1000x625")
+root.configure(bg="#212121")
 
-            elif search.lower() == 'all':
-                view_all(time)
-                single_search = input('Would you like to search a single package?: Yes or No: ')
-                if single_search.lower() == 'yes':
-                    package_id = input('Please enter a package number: ')
-                    time = input('Enter a time in HH:MM:SS format only: ')
-                    id = int(package_id)
-                    view_single(id, time)
-                else:
-                    exit = input('Would you like to exit? Yes or No: ')
-                    if exit.lower() == 'yes':
-                        break
-            else:
-                exit = input('Would you like to exit? Yes or No: ')
+label = tk.Label(root, 
+                text="Welcome to WGUPS delivery!", 
+                font=("Verdana", 20, "bold"),
+                bg="#212121",
+                foreground="white")
 
-                if exit.lower() == 'yes':
-                    break
+label.pack(pady=(5,5))
+
+mileage = calculate_milage(trucks)
+
+calculate_mileage_label = tk.Label(root, 
+                                text=f"The total mileage driven was {mileage} miles",
+                                font=("Arial", 12),
+                                bg="#212121",
+                                foreground="white")
+
+calculate_mileage_label.pack(pady=(5,5))
+
+search_label = tk.Label(root,
+                        text="Enter a package ID or All to view all:",
+                        font=("Arial", 10),
+                        bg="#212121",
+                        foreground="white")
+
+search_label.pack(pady=(5,5))
+
+search_entry = tk.Entry(root,
+                        width=30)
+search_entry.pack(pady=(3,3))
+
+time_label = tk.Label(root, text="Enter time in HH:MM:SS format:",
+                      font=("Arial", 10),
+                      bg="#212121",
+                      foreground="white")
+
+time_label.pack(pady=(3,3))
+
+time_entry = tk.Entry(root,
+                      width=30)
+time_entry.pack()
+
+search_button = tk.Button(root,
+                          text="Search",
+                          height=1,
+                          width=10,
+                          font=("Arial", 10, "bold"),
+                          bg="#2a63d4",
+                          foreground="white",
+                          command=handle_search)
+
+search_button.pack(pady=(10,3))
+
+exit_button = tk.Button(root,
+                        text="Exit",
+                        height=1,
+                        width=10,
+                        font=("Arial", 10, "bold"),
+                        bg="#2a63d4",
+                        foreground="white",
+                        command=root.quit)
+
+exit_button.pack(pady=(3,10))
+
+result_text = tk.Text(root,
+                      height=20,
+                      width=118)
+result_text.pack()
+
+root.mainloop()
 
